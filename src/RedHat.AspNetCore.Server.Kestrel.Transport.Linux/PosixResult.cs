@@ -18,13 +18,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             _value = value;
         }
 
-        public bool IsSuccess
-        {
-            get
-            {
-                return _value >= 0;
-            }
-        }
+        public bool IsSuccess => _value >= 0;
 
         internal string ErrorDescription()
         {
@@ -32,19 +26,17 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 return string.Empty;
             }
-            else
+
+            lock (s_descriptions)
             {
-                lock (s_descriptions)
+                if (s_descriptions.TryGetValue(_value, out string description))
                 {
-                    string description;
-                    if (s_descriptions.TryGetValue(_value, out description))
-                    {
-                        return description;
-                    }
-                    description = ErrorInterop.StrError(-_value);
-                    s_descriptions.Add(_value, description);
                     return description;
                 }
+                
+                description = ErrorInterop.StrError(-_value);
+                s_descriptions.Add(_value, description);
+                return description;
             }
         }
 
@@ -52,17 +44,15 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         {
             if (_value < 0)
             {
-                string name;
-                if (s_names.TryGetValue(_value, out name))
+                if (s_names.TryGetValue(_value, out string name))
                 {
                     return name;
                 }
+                
                 return $"E{-_value}";
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
 
         public Exception AsException()
@@ -71,6 +61,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 throw new InvalidOperationException($"{nameof(PosixResult)} is not an error.");
             }
+            
             return new IOException(ErrorName(), _value);
         }
 
@@ -102,10 +93,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return _value == other.Value._value;
         }
 
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
+        public override int GetHashCode() => _value.GetHashCode();
 
         public override string ToString()
         {
@@ -113,10 +101,8 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 return _value.ToString();
             }
-            else
-            {
-                return ErrorName();
-            }
+
+            return ErrorName();
         }
 
         public static bool operator==(PosixResult lhs, int nativeValue)

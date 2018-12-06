@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    sealed class AcceptThread : ITransportActionHandler
+    internal sealed class AcceptThread : ITransportActionHandler
     {
         private enum State
         {
@@ -14,7 +14,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             Stopped
         }
 
-        private Socket _socket;
+        private readonly Socket _socket;
         private State _state;
         private readonly object _gate = new object();
         private TaskCompletionSource<object> _stoppedTcs;
@@ -63,7 +63,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     _thread.Start();
                     _state = State.Started;
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     _state = State.Stopped;
                     _stoppedTcs = null;
@@ -92,7 +92,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     catch (ObjectDisposedException)
                     {}
                 }
-                return (Task)_stoppedTcs?.Task ?? Task.CompletedTask;
+                return _stoppedTcs?.Task ?? Task.CompletedTask;
             }
         }
 

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    enum AioOpCode : ushort
+    internal enum AioOpCode : ushort
     {
         PRead = 0,
         PWrite = 1,
@@ -17,7 +17,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         PWritev = 8
     }
 
-    struct AioEvent
+    internal struct AioEvent
     {
         public long          Data;
         private ulong       _iocb;
@@ -28,7 +28,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         public unsafe AioCb* AioCb => (AioCb*)_iocb;
     }
 
-    struct AioCb
+    internal struct AioCb
     {
         public long          Data;
         private long        _keyRwFlags;
@@ -46,7 +46,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         public int           Length { set { _nBytes = (ulong)value; } }
     }
 
-    struct AioRing
+    internal struct AioRing
     {
         public int Id;
         public int Nr;
@@ -58,7 +58,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         public int HeaderLength;
     }
 
-    static class AioInterop
+    internal static class AioInterop
     {
         [DllImport(Interop.Library, EntryPoint = "RHXKL_IoSetup")]
 
@@ -68,12 +68,12 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         public static extern PosixResult IoDestroy(IntPtr ctxp);
 
         [DllImport(Interop.Library, EntryPoint = "RHXKL_IoSubmit")]
-        public unsafe static extern PosixResult IoSubmit(IntPtr ctxp, int nr, AioCb** iocbpp);
+        public static extern unsafe PosixResult IoSubmit(IntPtr ctxp, int nr, AioCb** iocbpp);
 
         [DllImport(Interop.Library, EntryPoint = "RHXKL_IoGetEvents")]
-        public unsafe static extern PosixResult IoGetEvents(IntPtr ctxp, int minNr, int maxNr, AioEvent* events, int timeoutMs);
+        public static extern unsafe PosixResult IoGetEvents(IntPtr ctxp, int minNr, int maxNr, AioEvent* events, int timeoutMs);
 
-        public unsafe static PosixResult IoGetEvents(IntPtr ctxp, int nr, AioEvent* events)
+        public static unsafe PosixResult IoGetEvents(IntPtr ctxp, int nr, AioEvent* events)
         {
             if (nr <= 0)
             {

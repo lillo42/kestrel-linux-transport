@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    struct PipeEndPair
+    internal struct PipeEndPair
     {
         public PipeEnd ReadEnd;
         public PipeEnd WriteEnd;
@@ -15,16 +15,17 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         }
     }
 
-    static class PipeInterop
+    internal static class PipeInterop
     {
-        [DllImport(Interop.Library, EntryPoint="RHXKL_Pipe")]
-        public extern static PosixResult Pipe(out PipeEnd readEnd, out PipeEnd writeEnd, bool blocking);
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Pipe")]
+        public static extern PosixResult Pipe(out PipeEnd readEnd, out PipeEnd writeEnd, bool blocking);
     }
 
-    class PipeEnd : CloseSafeHandle
+    internal class PipeEnd : CloseSafeHandle
     {
         private PipeEnd()
-        {}
+        {
+        }
 
         public void WriteByte(byte b)
         {
@@ -49,14 +50,13 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         {
             byte b;
             var result = base.TryRead(&b, 1);
+
             if (result.IsSuccess)
             {
                 return new PosixResult(b);
             }
-            else
-            {
-                return result;
-            }
+
+            return result;
         }
 
         public int Write(ArraySegment<byte> buffer)
@@ -85,11 +85,9 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public static PipeEndPair CreatePair(bool blocking)
         {
-            PipeEnd readEnd;
-            PipeEnd writeEnd;
-            var result = PipeInterop.Pipe(out readEnd, out writeEnd, blocking);
+            var result = PipeInterop.Pipe(out PipeEnd readEnd, out PipeEnd writeEnd, blocking);
             result.ThrowOnError();
-            return new PipeEndPair { ReadEnd = readEnd, WriteEnd = writeEnd };
+            return new PipeEndPair {ReadEnd = readEnd, WriteEnd = writeEnd};
         }
     }
 }

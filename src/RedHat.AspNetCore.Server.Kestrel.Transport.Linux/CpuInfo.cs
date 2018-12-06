@@ -3,15 +3,16 @@ using System.IO;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    class CpuInfo
+    internal class CpuInfo
     {
-        class LogicalCpuInfo
+        private class LogicalCpuInfo
         {
             public int Id;
             public string SocketId;
             public string CoreId;
         }
-        static LogicalCpuInfo[] _cpuInfos = GetCpuInfos();
+
+        private static readonly LogicalCpuInfo[] _cpuInfos = GetCpuInfos();
 
         private static LogicalCpuInfo[] GetCpuInfos()
         {
@@ -20,8 +21,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             var cpuInfos = new List<LogicalCpuInfo>();
             foreach (var directory in directories)
             {
-                int id;
-                if (int.TryParse(directory.Substring(sysPath.Length + 4), out id))
+                if (int.TryParse(directory.Substring(sysPath.Length + 4), out int id))
                 {
                     var cpuInfo = new LogicalCpuInfo
                     {
@@ -41,6 +41,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 var socket = _cpuInfos[i].SocketId;
                 bool duplicate = false;
+                
                 for (int j = 0; j < i; j++)
                 {
                     if (socket == _cpuInfos[j].SocketId)
@@ -48,6 +49,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                         duplicate = true;
                     }
                 }
+                
                 if (!duplicate)
                 {
                     yield return socket;
@@ -59,12 +61,15 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             for (int i = 0; i < _cpuInfos.Length; i++)
             {
                 var cpuInfo = _cpuInfos[i];
+                
                 if (cpuInfo.SocketId != socket)
                 {
                     continue;
                 }
+                
                 var core = _cpuInfos[i].CoreId;
                 bool duplicate = false;
+                
                 for (int j = 0; j < i; j++)
                 {
                     if (_cpuInfos[j].SocketId != socket)
@@ -77,11 +82,13 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     }
                 }
                 if (!duplicate)
+                
                 {
                     yield return core;
                 }
             }
         }
+        
         public static IEnumerable<int> GetCpuIds(string socket, string core)
         {
             for (int i = 0; i < _cpuInfos.Length; i++)
@@ -94,6 +101,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 yield return _cpuInfos[i].Id;
             }
         }
+        
         public static int GetAvailableCpus()
         {
             return _cpuInfos.Length;

@@ -7,15 +7,15 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    static class IOInterop
+    internal static class IOInterop
     {
         [DllImport(Interop.Library, EntryPoint = "RHXKL_Close")]
         public static extern PosixResult Close(int handle);
 
         [DllImport(Interop.Library, EntryPoint = "RHXKL_Write")]
-        public static unsafe extern PosixResult Write(SafeHandle handle, byte* buf, int count);
+        public static extern unsafe PosixResult Write(SafeHandle handle, byte* buf, int count);
 
         [DllImport(Interop.Library, EntryPoint = "RHXKL_Read")]
-        public static unsafe extern PosixResult Read(SafeHandle handle, byte* buf, int count);
+        public static extern unsafe PosixResult Read(SafeHandle handle, byte* buf, int count);
     }
 }

@@ -10,6 +10,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
     {
         private static Dictionary<int, string> s_names;
         private static Dictionary<int, string> s_descriptions;
+
         static PosixResult()
         {
             const int count = 82;
@@ -104,13 +105,15 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             s_descriptions = new Dictionary<int, string>();
         }
 
-        private static void InitErrorInfo(ref int s_error, int errno, Dictionary<int, string> names, string errName)
+        private static void InitErrorInfo(ref int s_error, in int errno, Dictionary<int, string> names,
+            in string errName)
         {
             if (errno <= 0)
             {
                 s_error = -1;
                 return;
             }
+
             s_error = -errno;
             names[-errno] = errName;
         }

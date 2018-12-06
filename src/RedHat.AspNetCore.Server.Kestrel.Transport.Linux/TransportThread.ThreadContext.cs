@@ -12,14 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    sealed partial class TransportThread
+    internal sealed partial class TransportThread
     {
-        sealed class ThreadContext : IDisposable
+        private sealed class ThreadContext : IDisposable
         {
             private static readonly IPAddress NotIPSocket = IPAddress.None;
             private const int IoVectorsPerAioSocket = 8;
             private const int ListenBacklog = 128;
-            private  const int EventBufferLength = 512;
+            private const int EventBufferLength = 512;
             private const int EPollBlocked = 1;
             private const int EPollNotBlocked = 0;
             private const byte PipeStopThread = 0;

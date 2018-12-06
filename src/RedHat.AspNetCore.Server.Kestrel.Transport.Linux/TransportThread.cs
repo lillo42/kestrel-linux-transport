@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    sealed partial class TransportThread : ITransportActionHandler
+    internal sealed partial class TransportThread : ITransportActionHandler
     {
         private readonly object _gate = new object();
         private TransportThreadState _state;
@@ -31,11 +31,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public TransportThread(IPEndPoint endPoint, IConnectionDispatcher connectionDispatcher, LinuxTransportOptions options, AcceptThread acceptThread, int threadId, int cpuId, ILoggerFactory loggerFactory)
         {
-            if (connectionDispatcher == null)
-            {
-                throw new ArgumentNullException(nameof(connectionDispatcher));
-            }
-            ConnectionDispatcher = connectionDispatcher;
+            ConnectionDispatcher = connectionDispatcher ?? throw new ArgumentNullException(nameof(connectionDispatcher));
             ThreadId = threadId;
             CpuId = cpuId;
             EndPoint = endPoint;
@@ -66,8 +62,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     tcs = _stateChangeCompletion = new TaskCompletionSource<object>();
                     _state = TransportThreadState.Starting;
 
-                    _thread = new Thread(PollThread);
-                    _thread.IsBackground = true;
+                    _thread = new Thread(PollThread) {IsBackground = true};
                     _thread.Start();
                 }
                 catch

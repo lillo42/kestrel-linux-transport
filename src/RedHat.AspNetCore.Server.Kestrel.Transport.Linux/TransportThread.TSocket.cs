@@ -11,10 +11,10 @@ using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    sealed partial class TransportThread
+    internal sealed partial class TransportThread
     {
         [Flags]
-        enum SocketFlags
+        private enum SocketFlags
         {
             None            = 0,
 
@@ -39,7 +39,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             DeferSend       = 0x4000
         }
 
-        class TSocket : TransportConnection
+        private class TSocket : TransportConnection
         {
             public struct ReceiveMemoryAllocation
             {

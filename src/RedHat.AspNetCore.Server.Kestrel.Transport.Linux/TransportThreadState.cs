@@ -1,6 +1,6 @@
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    enum TransportThreadState
+    internal enum TransportThreadState
     {
         Initial,
         Starting,

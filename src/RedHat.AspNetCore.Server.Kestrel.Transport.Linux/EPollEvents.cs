@@ -3,7 +3,7 @@ using System;
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
     [Flags]
-    enum EPollEvents : int
+    internal enum EPollEvents
     {
         None     = 0,
         Readable = 0x01,    // EPOLLIN

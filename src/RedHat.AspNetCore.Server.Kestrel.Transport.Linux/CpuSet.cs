@@ -7,7 +7,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
     [TypeConverter(typeof(CpuSetTypeConverter))]
     internal struct CpuSet
     {
-        int[] _cpus;
+        private readonly int[] _cpus;
 
         public int[] Cpus => _cpus ?? Array.Empty<int>();
 
@@ -24,34 +24,41 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 return false;
             }
+
             throw new FormatException(error);
         }
 
         public static bool Parse(string set, out CpuSet cpus, bool tryParse)
         {
-            cpus = default(CpuSet);
+            cpus = default;
+
             if (set == null)
             {
                 if (tryParse)
                 {
                     return false;
                 }
+
                 throw new ArgumentNullException(nameof(set));
             }
+
             if (set.Length == 0)
             {
                 cpus = new CpuSet(Array.Empty<int>());
                 return true;
             }
+
             int index = 0;
+
             var cpuList = new List<int>();
+
             do
             {
-                int start;
-                if (!TryParseNumber(set, ref index, out start))
+                if (!TryParseNumber(set, ref index, out int start))
                 {
                     return ParseFailed(tryParse, $"Can not parse number at {index}");
                 }
+
                 if (index == set.Length)
                 {
                     cpuList.Add(start);
@@ -66,19 +73,21 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 else if (set[index] == '-')
                 {
                     index++;
-                    int end;
-                    if (!TryParseNumber(set, ref index, out end))
+                    if (!TryParseNumber(set, ref index, out int end))
                     {
                         return ParseFailed(tryParse, $"Can not parse number at {index}");
                     }
+
                     if (start > end)
                     {
                         return ParseFailed(tryParse, "End of range is larger than start");
                     }
+
                     for (int i = start; i <= end; i++)
                     {
                         cpuList.Add(i);
                     }
+
                     if (index == set.Length)
                     {
                         break;
@@ -98,6 +107,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     return ParseFailed(tryParse, $"Invalid character at {index}: '{set[index]}'");
                 }
             } while (index != set.Length);
+
             var cpuArray = cpuList.ToArray();
             Array.Sort(cpuArray);
             cpus = new CpuSet(cpuArray);
@@ -111,8 +121,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public static CpuSet Parse(string set)
         {
-            CpuSet cpus;
-            Parse(set, out cpus, tryParse: false);
+            Parse(set, out CpuSet cpus, tryParse: false);
             return cpus;
         }
 
@@ -123,8 +132,14 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 value = 0;
                 return false;
             }
+
             int startIndex = index;
-            while (index < s.Length && Char.IsDigit(s[index])) { index++; }
+            
+            while (index < s.Length && char.IsDigit(s[index]))
+            {
+                index++;
+            }
+
             return int.TryParse(s.Substring(startIndex, index - startIndex), out value);
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    unsafe struct IPSocketAddress
+    internal unsafe struct IPSocketAddress
     {
         private short     _family;
         public ushort     Port;
@@ -69,7 +69,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         }
     }
 
-    unsafe struct UnixSocketAddress
+    internal unsafe struct UnixSocketAddress
     {
         private const int PathLength = 108;
         public unsafe UnixSocketAddress(string path)

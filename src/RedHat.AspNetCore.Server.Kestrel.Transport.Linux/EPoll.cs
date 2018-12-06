@@ -4,29 +4,31 @@ using System.Threading;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    static class EPollInterop
+    internal static class EPollInterop
     {
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_EPollCreate")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_EPollCreate")]
         public static extern PosixResult EPollCreate(out EPoll epoll);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_EPollWait")]
-        public static unsafe extern PosixResult EPollWait(int epoll, void* events, int maxEvents, int timeout);
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_EPollWait")]
+        public static extern unsafe PosixResult EPollWait(int epoll, void* events, int maxEvents, int timeout);
+        
         public static unsafe PosixResult EPollWait(EPoll epoll, void* events, int maxEvents, int timeout)
-        => EPollWait(epoll.DangerousGetHandle().ToInt32(), events, maxEvents, timeout);
+            => EPollWait(epoll.DangerousGetHandle().ToInt32(), events, maxEvents, timeout);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_EPollControl")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_EPollControl")]
         public static extern PosixResult EPollControl(int epoll, EPollOperation operation, int fd, EPollEvents events, long data);
+        
         public static PosixResult EPollControl(EPoll epoll, EPollOperation operation, SafeHandle fd, EPollEvents events, long data)
-        => EPollControl(epoll.DangerousGetHandle().ToInt32(), operation, fd.DangerousGetHandle().ToInt32(), events, data);
+            => EPollControl(epoll.DangerousGetHandle().ToInt32(), operation, fd.DangerousGetHandle().ToInt32(), events, data);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_SizeOfEPollEvent")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_SizeOfEPollEvent")]
         public static extern int SizeOfEPollEvent();
     }
 
     // Warning: Some operations use DangerousGetHandle for increased performance
-    class EPoll : CloseSafeHandle
+    internal class EPoll : CloseSafeHandle
     {
-        private static bool s_packedEvents = false;
+        private static readonly bool s_packedEvents = false;
         public static bool PackedEvents => s_packedEvents;
         public const int TimeoutInfinite = -1;
         private bool _released = false;
@@ -53,8 +55,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public static EPoll Create()
         {
-            EPoll epoll;
-            var result = EPollInterop.EPollCreate(out epoll);
+            var result = EPollInterop.EPollCreate(out EPoll epoll);
             result.ThrowOnError();
             return epoll;
         }
@@ -100,7 +101,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             Dispose();
 
             // block until the refcount drops to zero
-            SpinWait sw = new SpinWait();
+            var sw = new SpinWait();
             while (!_released)
             {
                 sw.SpinOnce();

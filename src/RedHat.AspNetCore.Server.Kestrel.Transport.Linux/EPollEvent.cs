@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
     [StructLayout(LayoutKind.Explicit, Size = 8)]
-    struct EPollData
+    internal struct EPollData
     {
         [FieldOffset(0)]
         public long   Long;
@@ -15,7 +15,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
     // EPoll.PackedEvents == false (64-bit systems, except x64)
     [StructLayout(LayoutKind.Sequential, Size = 16, Pack = 8)]
-    struct EPollEvent
+    internal struct EPollEvent
     {
         public EPollEvents Events;
         public EPollData Data;
@@ -23,7 +23,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
     // EPoll.PackedEvents == true (32-bit systems and x64)
     [StructLayout(LayoutKind.Sequential, Size = 12, Pack = 4)]
-    struct EPollEventPacked
+    internal struct EPollEventPacked
     {
         public EPollEvents Events;
         public EPollData Data;

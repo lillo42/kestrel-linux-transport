@@ -1,6 +1,6 @@
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    enum AddressFamily : int
+    internal enum AddressFamily
     {
         Unspecified = 0,
         Unix = 1,
@@ -8,7 +8,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         InterNetworkV6 = 23
     }
 
-    enum SocketType : int
+    internal enum SocketType
     {
         Stream = 1,
         Dgram = 2,
@@ -17,7 +17,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         Seqpacket = 5
     }
 
-    enum ProtocolType : int
+    internal enum ProtocolType
     {
         Unspecified = 0,
         Icmp = 1,
@@ -26,7 +26,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         Icmpv6 = 58
     }
 
-    enum SocketShutdown : int
+    internal enum SocketShutdown
     {
         // Shutdown sockets for receive.
         Receive = 0x00,
@@ -35,7 +35,8 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         // Shutdown socket for both send and receive.
         Both = 0x02,
     }
-    enum SocketOptionLevel
+
+    internal enum SocketOptionLevel
     {
         // Indicates socket options apply to the socket itself.
         Socket = 0xffff,
@@ -52,7 +53,8 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         // Indicates socket options apply to Udp sockets.
         Udp = ProtocolType.Udp,
     }
-    enum SocketOptionName
+
+    internal enum SocketOptionName
     {
         #region SocketOptionLevel.Socket
         // Record debugging information.

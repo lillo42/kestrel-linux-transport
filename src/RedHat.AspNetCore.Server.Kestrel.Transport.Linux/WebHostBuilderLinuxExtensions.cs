@@ -14,22 +14,22 @@ namespace Microsoft.AspNetCore.Hosting
             {
                 return hostBuilder;
             }
+
             return hostBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton<ITransportFactory, LinuxTransportFactory>();
             });
         }
 
-        public static IWebHostBuilder UseLinuxTransport(this IWebHostBuilder hostBuilder, Action<LinuxTransportOptions> options)
+        public static IWebHostBuilder UseLinuxTransport(this IWebHostBuilder hostBuilder,
+            Action<LinuxTransportOptions> options)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return hostBuilder;
             }
-            return hostBuilder.UseLinuxTransport().ConfigureServices(services =>
-            {
-                services.Configure(options);
-            });
+
+            return hostBuilder.UseLinuxTransport().ConfigureServices(services => { services.Configure(options); });
         }
     }
 }

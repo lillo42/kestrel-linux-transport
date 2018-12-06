@@ -7,8 +7,8 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
     public class LinuxTransportFactory : ITransportFactory
     {
-        private LinuxTransportOptions _options;
-        private ILoggerFactory _loggerFactory;
+        private readonly LinuxTransportOptions _options;
+        private readonly ILoggerFactory _loggerFactory;
 
         public LinuxTransportFactory(IOptions<LinuxTransportOptions> options, ILoggerFactory loggerFactory)
         {
@@ -16,17 +16,14 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 throw new ArgumentNullException(nameof(options));
             }
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
+
             _options = options.Value;
-            _loggerFactory = loggerFactory;
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
-        public ITransport Create(IEndPointInformation IEndPointInformation, IConnectionDispatcher handler)
+        public ITransport Create(IEndPointInformation endPointInformation, IConnectionDispatcher handler)
         {
-            return new Transport(IEndPointInformation, handler, _options, _loggerFactory);
+            return new Transport(endPointInformation, handler, _options, _loggerFactory);
         }
     }
 }

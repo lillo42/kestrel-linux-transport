@@ -2,19 +2,20 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    class SchedulerInterop
+    internal static class SchedulerInterop
     {
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_SetCurrentThreadAffinity")]
-        public extern static PosixResult SetCurrentThreadAffinity(int cpuId);
+        public static extern PosixResult SetCurrentThreadAffinity(int cpuId);
+        
         [DllImport(Interop.Library, EntryPoint="RHXKL_ClearCurrentThreadAffinity")]
-        public extern static PosixResult ClearCurrentThreadAffinity();
+        public static extern PosixResult ClearCurrentThreadAffinity();
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_GetAvailableCpusForProcess")]
-        public extern static PosixResult GetAvailableCpusForProcess();
+        public static extern PosixResult GetAvailableCpusForProcess();
     }
 
-    class SystemScheduler
+    internal static class SystemScheduler
     {
         public static PosixResult TrySetCurrentThreadAffinity(int cpuId)
         {

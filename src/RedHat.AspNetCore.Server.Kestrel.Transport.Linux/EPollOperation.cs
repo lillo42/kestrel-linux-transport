@@ -1,6 +1,6 @@
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    enum EPollOperation : int
+    internal enum EPollOperation : int
     {
         Add    = 1, // EPOLL_CTL_ADD
         Delete = 2, // EPOLL_CTL_DEL

@@ -4,13 +4,13 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    unsafe struct IOVector
+    internal unsafe struct IOVector
     {
         public void* Base;
         public void* Count;
     }
 
-    struct SocketPair
+    internal struct SocketPair
     {
         public int Socket1;
         public int Socket2;
@@ -30,9 +30,9 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         }
     }
 
-    static class SocketInterop
+    internal static class SocketInterop
     {
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Socket")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Socket")]
         public static extern unsafe PosixResult Socket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, bool blocking, out int socket);
 
         public static PosixResult Socket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, bool blocking, out Socket socket)
@@ -43,29 +43,29 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return result;
         }
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_GetAvailableBytes")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_GetAvailableBytes")]
         public static extern PosixResult GetAvailableBytes(int socket);
 
         public static PosixResult GetAvailableBytes(Socket socket)
             => GetAvailableBytes(socket.DangerousGetHandle().ToInt32());
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Bind")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Bind")]
         public static extern unsafe PosixResult Bind(int socket, byte* addr, int addrlen);
 
         public static unsafe PosixResult Bind(Socket socket, byte* addr, int addrlen)
             => Bind(socket.DangerousGetHandle().ToInt32(), addr, addrlen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Connect")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Connect")]
         public static extern unsafe PosixResult Connect(Socket socket, byte* addr, int addrlen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Listen")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Listen")]
         public static extern PosixResult Listen(int socket, int backlog);
 
         public static PosixResult Listen(Socket socket, int backlog)
             => Listen(socket.DangerousGetHandle().ToInt32(), backlog);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Accept")]
-        public static unsafe extern PosixResult Accept(int socket, byte* socketAddress, int socketAddressLen, bool blocking, out int clientSocket);
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Accept")]
+        public static extern unsafe PosixResult Accept(int socket, byte* socketAddress, int socketAddressLen, bool blocking, out int clientSocket);
 
         public static unsafe PosixResult Accept(Socket socket, byte* socketAddress, int socketAddressLen, bool blocking, out Socket clientSocket)
         {
@@ -75,72 +75,73 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return result;
         }
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Shutdown")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Shutdown")]
         public static extern PosixResult Shutdown(Socket socket, SocketShutdown shutdown);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Send")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Send")]
         public static extern unsafe PosixResult Send(int socket, IOVector* ioVectors, int ioVectorLen, int flags = 0);
+        
         public static unsafe PosixResult Send(SafeHandle socket, IOVector* ioVectors, int ioVectorLen, int flags = 0)
-        => Send(socket.DangerousGetHandle().ToInt32(), ioVectors, ioVectorLen, flags);
+         => Send(socket.DangerousGetHandle().ToInt32(), ioVectors, ioVectorLen, flags);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Receive")]
-        public static unsafe extern PosixResult Receive(int socket, IOVector* ioVectors, int ioVectorLen);
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Receive")]
+        public static extern unsafe PosixResult Receive(int socket, IOVector* ioVectors, int ioVectorLen);
+        
         public static unsafe PosixResult Receive(SafeHandle socket, IOVector* ioVectors, int ioVectorLen)
-        => Receive(socket.DangerousGetHandle().ToInt32(), ioVectors, ioVectorLen);
+         => Receive(socket.DangerousGetHandle().ToInt32(), ioVectors, ioVectorLen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_SetSockOpt")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_SetSockOpt")]
         public static extern unsafe PosixResult SetSockOpt(int socket, SocketOptionLevel optionLevel, SocketOptionName optionName, byte* optionValue, int optionLen);
 
         public static unsafe PosixResult SetSockOpt(Socket socket, SocketOptionLevel optionLevel, SocketOptionName optionName, byte* optionValue, int optionLen)
             => SetSockOpt(socket.DangerousGetHandle().ToInt32(), optionLevel, optionName, optionValue, optionLen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_GetSockOpt")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_GetSockOpt")]
         public static extern unsafe PosixResult GetSockOpt(SafeHandle socket, SocketOptionLevel optionLevel, SocketOptionName optionName, byte* optionValue, int* optionLen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_GetPeerName")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_GetPeerName")]
         public static extern unsafe PosixResult GetPeerName(int socket, byte* addr, int addrlen);
 
         public static unsafe PosixResult GetPeerName(Socket socket, byte* addr, int addrlen)
             => GetPeerName(socket.DangerousGetHandle().ToInt32(), addr, addrlen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_GetSockName")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_GetSockName")]
         public static extern unsafe PosixResult GetSockName(int socket, byte* addr, int addrlen);
 
         public static unsafe PosixResult GetSockName(Socket socket, byte* addr, int addrlen)
             => GetSockName(socket.DangerousGetHandle().ToInt32(), addr, addrlen);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_Duplicate")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_Duplicate")]
         public static extern PosixResult Duplicate(Socket socket, out Socket dup);
 
-        [DllImportAttribute(Interop.Library, EntryPoint = "RHXKL_SocketPair")]
+        [DllImport(Interop.Library, EntryPoint = "RHXKL_SocketPair")]
         public static extern PosixResult SocketPair(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, bool blocking, out int socket1, out int socket2);
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_ReceiveHandle")]
-        public extern static PosixResult ReceiveSocket(int fromSocket, out int socket, bool blocking);
+        public static extern PosixResult ReceiveSocket(int fromSocket, out int socket, bool blocking);
 
         public static PosixResult ReceiveSocket(Socket fromSocket, out Socket socket, bool blocking)
         {
-            int receiveSocketFd;
-            PosixResult result = ReceiveSocket(fromSocket.DangerousGetHandle().ToInt32(), out receiveSocketFd, blocking);
+            PosixResult result = ReceiveSocket(fromSocket.DangerousGetHandle().ToInt32(), out int receiveSocketFd, blocking);
             socket = result.IsSuccess ? new Socket(receiveSocketFd) : null;
             return result;
         }
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_AcceptAndSendHandleTo")]
-        public extern static PosixResult AcceptAndSendHandleTo(Socket fromSocket, int toSocket);
+        public static extern PosixResult AcceptAndSendHandleTo(Socket fromSocket, int toSocket);
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_CompleteZeroCopy")]
-        public extern static PosixResult CompleteZeroCopy(int socket);
+        public static extern PosixResult CompleteZeroCopy(int socket);
 
         [DllImport(Interop.Library, EntryPoint="RHXKL_Disconnect")]
-        public extern static PosixResult Disconnect(int socket);
+        public static extern PosixResult Disconnect(int socket);
 
         public const int ZeroCopyCopied = 0;
         public const int ZeroCopySuccess = 1;
     }
 
     // Warning: Some operations use DangerousGetHandle for increased performance
-    class Socket : CloseSafeHandle
+    internal class Socket : CloseSafeHandle
     {
         private Socket()
         {}
@@ -151,8 +152,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public static Socket Create(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, bool blocking)
         {
-            Socket socket;
-            var result = SocketInterop.Socket(addressFamily, socketType, protocolType, blocking, out socket);
+            var result = SocketInterop.Socket(addressFamily, socketType, protocolType, blocking, out Socket socket);
             result.ThrowOnError();
             return socket;
         }
@@ -177,7 +177,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public unsafe PosixResult TryBind(string unixPath)
         {
-            UnixSocketAddress socketAddress = new UnixSocketAddress(unixPath);
+            var socketAddress = new UnixSocketAddress(unixPath);
             return SocketInterop.Bind(this, (byte*)&socketAddress, sizeof(UnixSocketAddress));
         }
 
@@ -213,7 +213,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public unsafe PosixResult TryConnect(string unixPath)
         {
-            UnixSocketAddress socketAddress = new UnixSocketAddress(unixPath);
+            var socketAddress = new UnixSocketAddress(unixPath);
             return SocketInterop.Connect(this, (byte*)&socketAddress, sizeof(UnixSocketAddress));
         }
 
@@ -228,10 +228,9 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return SocketInterop.Listen(this, backlog);
         }
 
-        public unsafe Socket Accept(bool blocking)
+        public Socket Accept(bool blocking)
         {
-            Socket clientSocket;
-            var result = TryAccept(out clientSocket, blocking);
+            var result = TryAccept(out var clientSocket, blocking);
             result.ThrowOnError();
             return clientSocket;
         }
@@ -253,7 +252,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             ValidateSegment(buffer);
             fixed (byte* buf = buffer.Array)
             {
-                IOVector ioVector = new IOVector() { Base = buf + buffer.Offset, Count = (void*)buffer.Count };
+                var ioVector = new IOVector() { Base = buf + buffer.Offset, Count = (void*)buffer.Count };
                 return SocketInterop.Receive(this, &ioVector, 1);
             }
         }
@@ -293,7 +292,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             ValidateSegment(buffer);
             fixed (byte* buf = buffer.Array)
             {
-                IOVector ioVector = new IOVector() { Base = buf + buffer.Offset, Count = (void*)buffer.Count };
+                var ioVector = new IOVector() { Base = buf + buffer.Offset, Count = (void*)buffer.Count };
                 return SocketInterop.Send(this, &ioVector, 1);
             }
         }
@@ -344,8 +343,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public IPEndPointStruct GetLocalIPAddress(IPAddress reuseAddress = null)
         {
-            IPEndPointStruct ep;
-            TryGetLocalIPAddress(out ep, reuseAddress)
+            TryGetLocalIPAddress(out IPEndPointStruct ep, reuseAddress)
                 .ThrowOnError();
             return ep;
         }
@@ -354,21 +352,13 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         {
             IPSocketAddress socketAddress;
             var rv = SocketInterop.GetSockName(this, (byte*)&socketAddress, sizeof(IPSocketAddress));
-            if (rv.IsSuccess)
-            {
-                ep = socketAddress.ToIPEndPoint(reuseAddress);
-            }
-            else
-            {
-                ep = default(IPEndPointStruct);
-            }
+            ep = rv.IsSuccess ? socketAddress.ToIPEndPoint(reuseAddress) : default;
             return rv;
         }
 
         public IPEndPointStruct GetPeerIPAddress()
         {
-            IPEndPointStruct ep;
-            TryGetPeerIPAddress(out ep)
+            TryGetPeerIPAddress(out IPEndPointStruct ep)
                 .ThrowOnError();
             return ep;
         }
@@ -377,14 +367,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
         {
             IPSocketAddress socketAddress;
             var rv = SocketInterop.GetPeerName(this, (byte*)&socketAddress, sizeof(IPSocketAddress));
-            if (rv.IsSuccess)
-            {
-                ep = socketAddress.ToIPEndPoint();
-            }
-            else
-            {
-                ep = default(IPEndPointStruct);
-            }
+            ep = rv.IsSuccess ? socketAddress.ToIPEndPoint() : default;
             return rv;
         }
 
@@ -418,18 +401,16 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         public static SocketPair CreatePair(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, bool blocking)
         {
-            int socket1;
-            int socket2;
-            var result = SocketInterop.SocketPair(addressFamily, socketType, protocolType, blocking, out socket1, out socket2);
+            SocketInterop.SocketPair(addressFamily, socketType, protocolType, blocking, out var socket1, out var socket2);
             return new SocketPair { Socket1 = socket1, Socket2 = socket2 };
         }
 
-        public unsafe PosixResult TryReceiveSocket(out Socket socket, bool blocking)
+        public PosixResult TryReceiveSocket(out Socket socket, bool blocking)
         {
             return SocketInterop.ReceiveSocket(this, out socket, blocking);
         }
 
-        public unsafe PosixResult TryAcceptAndSendHandleTo(int toSocket)
+        public PosixResult TryAcceptAndSendHandleTo(int toSocket)
         {
             return SocketInterop.AcceptAndSendHandleTo(this, toSocket);
         }

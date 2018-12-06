@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 {
-    static class ErrorInterop
+    internal static class ErrorInterop
     {
         public static unsafe string StrError(int errno)
         {
