@@ -17,10 +17,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             : base(new IntPtr(handle), true)
         {}
 
-        public override bool IsInvalid
-        {
-            get { return handle == new IntPtr(-1); }
-        }
+        public override bool IsInvalid => handle == new IntPtr(-1);
 
         protected override bool ReleaseHandle()
         {

@@ -79,25 +79,31 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             {
                 return new PosixResult(PosixResult.EINVAL);
             }
+            
             AioRing* pRing = (AioRing*)ctxp;
+            
             if (pRing->Magic == 0xa10a10a1 && pRing->IncompatFeatures == 0)
             {
                 int head = pRing->Head;
                 int tail = pRing->Tail;
                 int available = tail - head;
+                
                 if (available < 0)
                 {
                     available += pRing->Nr;
                 }
+                
                 if (available >= nr)
                 {
                     AioEvent* ringEvents = (AioEvent*)((byte*)pRing + pRing->HeaderLength);
                     AioEvent* start = ringEvents + head;
                     AioEvent* end = start + nr;
+                    
                     if (head + nr > pRing->Nr)
                     {
                         end -= pRing->Nr;
                     }
+                    
                     if (end > start)
                     {
                         Copy(start, end, events);
@@ -107,11 +113,13 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                         AioEvent* eventsEnd = Copy(start, ringEvents + pRing->Nr, events);
                         Copy(ringEvents, end, eventsEnd);
                     }
+                    
                     head += nr;
                     if (head >= pRing->Nr)
                     {
                         head -= pRing->Nr;
                     }
+                    
                     pRing->Head = head;
                     return new PosixResult(nr);
                 }

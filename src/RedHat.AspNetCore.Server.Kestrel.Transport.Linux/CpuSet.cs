@@ -18,7 +18,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             _cpus = cpus;
         }
 
-        private static bool ParseFailed(bool tryParse, string error)
+        private static bool ParseFailed(in bool tryParse, in string error)
         {
             if (tryParse)
             {
@@ -28,7 +28,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             throw new FormatException(error);
         }
 
-        public static bool Parse(string set, out CpuSet cpus, bool tryParse)
+        public static bool Parse(in string set, out CpuSet cpus, in bool tryParse)
         {
             cpus = default;
 
@@ -68,7 +68,6 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 {
                     cpuList.Add(start);
                     index++;
-                    continue;
                 }
                 else if (set[index] == '-')
                 {
@@ -95,7 +94,6 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     else if (set[index] == ',')
                     {
                         index++;
-                        continue;
                     }
                     else
                     {
@@ -114,18 +112,18 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return true;
         }
 
-        public static bool TryParse(string set, out CpuSet cpus)
+        public static bool TryParse(in string set, out CpuSet cpus)
         {
             return Parse(set, out cpus, tryParse: true);
         }
 
-        public static CpuSet Parse(string set)
+        public static CpuSet Parse(in string set)
         {
             Parse(set, out CpuSet cpus, tryParse: false);
             return cpus;
         }
 
-        private static bool TryParseNumber(string s, ref int index, out int value)
+        private static bool TryParseNumber(in string s, ref int index, out int value)
         {
             if (index == s.Length)
             {
@@ -143,9 +141,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             return int.TryParse(s.Substring(startIndex, index - startIndex), out value);
         }
 
-        public override string ToString()
-        {
-            return _cpus == null ? string.Empty : string.Join(",", _cpus);
-        }
+        public override string ToString() 
+            => _cpus == null ? string.Empty : string.Join(",", _cpus);
     }
 }

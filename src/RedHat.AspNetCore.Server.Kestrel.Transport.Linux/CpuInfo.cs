@@ -16,7 +16,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
 
         private static LogicalCpuInfo[] GetCpuInfos()
         {
-            var sysPath = "/sys/devices/system/cpu";
+            const string sysPath = "/sys/devices/system/cpu";
             var directories = Directory.GetDirectories(sysPath, "cpu*");
             var cpuInfos = new List<LogicalCpuInfo>();
             foreach (var directory in directories)
@@ -29,9 +29,11 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                         SocketId = File.ReadAllText($"{sysPath}/cpu{id}/topology/physical_package_id").Trim(),
                         CoreId = File.ReadAllText($"{sysPath}/cpu{id}/topology/core_id").Trim()
                     };
+                    
                     cpuInfos.Add(cpuInfo);
                 }
             }
+
             return cpuInfos.ToArray();
         }
 
@@ -47,6 +49,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                     if (socket == _cpuInfos[j].SocketId)
                     {
                         duplicate = true;
+                        break;
                     }
                 }
                 
@@ -56,6 +59,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 }
             }
         }
+        
         public static IEnumerable<string> GetCores(string socket)
         {
             for (int i = 0; i < _cpuInfos.Length; i++)
@@ -72,15 +76,16 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 
                 for (int j = 0; j < i; j++)
                 {
-                    if (_cpuInfos[j].SocketId != socket)
+                    if (_cpuInfos[j].SocketId != socket
+                        && core != _cpuInfos[j].CoreId)
                     {
                         continue;
                     }
-                    if (core == _cpuInfos[j].CoreId)
-                    {
-                        duplicate = true;
-                    }
+
+                    duplicate = true;
+                    break;
                 }
+                
                 if (!duplicate)
                 
                 {
@@ -98,13 +103,12 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
                 {
                     continue;
                 }
+                
                 yield return _cpuInfos[i].Id;
             }
         }
         
-        public static int GetAvailableCpus()
-        {
-            return _cpuInfos.Length;
-        }
+        public static int GetAvailableCpus() 
+            => _cpuInfos.Length;
     }
 }

@@ -57,7 +57,7 @@ namespace RedHat.AspNetCore.Server.Kestrel.Transport.Linux
             _transportOptions = transportOptions;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<Transport>();
-            _threads = Array.Empty<TransportThread>();
+            _threads = Array.Empty<ITransportActionHandler>();
         }
 
         public async Task BindAsync()
